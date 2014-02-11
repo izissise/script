@@ -8,7 +8,9 @@
 ## Last update Mon Feb  3 17:37:39 2014 jonathan.collinet
 ##
 
-SRC		=	main.c
+SRC		=	main.c \
+			envvar.c \
+			opt.c
 
 CC		=	gcc
 
