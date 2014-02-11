@@ -16,5 +16,15 @@ int	main(int ac, char *av[], char *env[])
 
   if (parse_opt(ac, av, env, &script))
     return (1);
+  printf("shell: %s, file: %s, append: %d, returnex: %d, flush: %d, force: %d, quiet: %d, timing: %d\n",
+         script.shell,
+         script.file,
+         script.append,
+         script.returnex,
+         script.flush,
+         script.force,
+         script.quiet,
+         script.timing
+        );
   return (0);
 }

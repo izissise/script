@@ -12,6 +12,7 @@
 # define INCLUDE_H_INCLUDED
 
 # include <stdlib.h>
+# include <stdio.h>
 # include <string.h>
 # include <getopt.h>
 
@@ -25,6 +26,7 @@ typedef struct	s_script
   char		force;
   char		quiet;
   char		timing;
+  char		*timingout;
 }		t_script;
 
 char	*get_envvar(char *var, char **env);
