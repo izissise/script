@@ -8,27 +8,20 @@
 ## Last update Mon Feb  3 17:37:39 2014 jonathan.collinet
 ##
 
-SRC		=	malloc.c \
-			init_chunk.c \
-			search_node.c \
-			chunk.c \
-			real_malloc.c \
-			realloc.c \
-			show_alloc_mem.c
+SRC		=	main.c
 
 CC		=	gcc
 
 RM		=	rm -f
 
-SYMLINK		=	libmy_malloc.so
-NAME		=	libmy_malloc_$(HOSTTYPE).so
+NAME		=	my_script
 
 OBJDIR		=	obj/
 SRCDIR		=	src/
 
-CFLAGS		+=	-g -Wall -Wextra -fPIC
+CFLAGS		+=	-g -Wall -Wextra
 
-LDFLAGS		+=	-shared -pthread
+LDFLAGS		+=
 
 OBJ		=	$(patsubst %.c,${OBJDIR}%.o, $(SRC))
 
@@ -48,7 +41,6 @@ $(NAME):	$(OBJ)
 		@echo -e "Linking $@ { $(LDFLAGS) }" | sed 's/^-e //' \
 		| sed 's/[-a-zA-Z]\+/\x1B[34m&\x1B[0m/g'
 		@$(CC) $(LDFLAGS) -o $(NAME) $(OBJ)
-		@ln -f -s $(NAME) $(SYMLINK)
 
 all:	$(NAME)
 
