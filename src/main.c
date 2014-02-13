@@ -17,7 +17,7 @@ int			init_term(struct termios *cpy, int ttyout)
 
   i = -1;
   if (tcgetattr(ttyout, cpy) == -1)
-    return (0);
+    return (1);
   t.c_iflag = cpy->c_iflag;
   t.c_oflag = cpy->c_oflag;
   t.c_cflag = cpy->c_cflag;
@@ -30,53 +30,111 @@ int			init_term(struct termios *cpy, int ttyout)
   UNSETFLAG(t.c_lflag, (ECHO | ICANON));
   t.c_cc[VTIME] = 100;
   if (tcsetattr(ttyout, TCSANOW, &t) == -1)
-    return (0);
+    return (1);
+  return (0);
+}
+
+char	*my_ptsname(int fdm)
+{
+  int	sminor;
+  char	pts_name[20];
+
+  if (ioctl(fdm, TIOCGPTN, &sminor) < 0)
+    return(NULL);
+  snprintf(pts_name, sizeof(pts_name), "/dev/pts/%d", sminor);
+  return(strdup(pts_name));
+}
+
+int	my_grantpt(int fd)
+{
+  char	*name;
+  int	ret;
+
+  name = my_ptsname(fd);
+  ret = (chmod(name, S_IRUSR | S_IWUSR | S_IWGRP));
+  free(name);
+  return (ret);
+}
+
+int	my_unlockpt(int fd)
+{
+  int	lock;
+
+  lock = 0;
+  return ioctl(fd, TIOCSPTLCK, &lock);
+}
+
+int	my_openpty(int *amaster, int *aslave)
+{
+  char	*slave_name;
+
+  *amaster = -1;
+  *aslave = -1;
+  slave_name = NULL;
+  if (((*amaster = getpt()) != -1)
+      && ((slave_name = my_ptsname(*amaster)) != NULL)
+      && (my_grantpt(*amaster) != -1) && (my_unlockpt(*amaster) != -1)
+      && ((*aslave = open(slave_name, O_RDWR)) != -1))
+    {
+      free(slave_name);
+      return (0);
+    }
+  free(slave_name);
+  close(*amaster);
+  close(*aslave);
+  perror(NULL);
   return (1);
 }
 
-void	restore_term(struct termios *t, int ttyout)
+int	my_login_tty(int slave)
 {
-  tcsetattr(ttyout, TCSANOW, t);
+  if ((dup2(slave, STDIN_FILENO) != -1) && (dup2(slave, STDOUT_FILENO) != -1)
+      && (dup2(slave, STDERR_FILENO) != -1))
+    return (0);
+  perror(NULL);
+  return (1);
 }
 
-int	my_openpty(int *amaster, int *aslave, char *name)
+pid_t	my_forkpty(t_script *s, int master, int slave, struct termios* t)
 {
-
+  pid_t	child;
+  child = fork();
+  if (child > 0)
+    {
+      if (init_term(t, master))
+        {
+          perror(NULL);
+          close(master);
+          close(slave);
+          return (1);
+        }
+    }
+  else if (child == 0)
+    {
+      my_login_tty(slave);
+      execlp(s->shell, s->shell);
+      exit(-1);
+    }
+  else
+    {
+      perror(NULL);
+      return (0);
+    }
+  return (child);
 }
 
 int	main(int ac, char *av[], char *env[])
 {
   t_script	script;
   int		master_fd;
-  char		*slave_name;
   int		slave_fd;
   struct termios	t;
 
-  if (parse_opt(ac, av, env, &script))
+  if (parse_opt(ac, av, env, &script) || my_openpty(&master_fd, &slave_fd))
     return (1);
-  pid_t pid =  forkpty(&master_fd, slave_name, &t, NULL);
-  if (pid == 0)
-    {
-
-      return (0);
-    }
-  else
-    {
-      if (!init_term(&t, master_fd))
-        return (1);
-    }
-
-  /* master_fd = getpt();
-   slave_name = ptsname(master_fd);
-   slave_fd = open(slave_name, O_RDWR);
-   if (!grantpt(slave_fd))
-     {
-     }
-
-   if (!unlockpt(slave_fd))
-     {
-     }
-
+  if ((my_forkpty(&script, master_fd, slave_fd, &t)) == 0)
+    return (1);
+  /*
    printf("shell: %s, file: %s, append: %d, returnex: %d, flush: %d, force: %d, quiet: %d, timing: %d\n",
           script.shell,
           script.file,
@@ -87,5 +145,11 @@ int	main(int ac, char *av[], char *env[])
           script.quiet,
           script.timing
          );*/
+  tcsetattr(master_fd, TCSANOW, &t);
+  close(master_fd);
+  close(slave_fd);
   return (0);
 }
+
+
+
