@@ -47,8 +47,18 @@ void	init_opt(char **envp, t_script *script, struct option *opt)
 
 int		help()
 {
-  fprintf(stderr, "Version 48, moriss_h\n");
-  fprintf(stderr, "Help there\n");
+  fprintf(stderr, "Usage:\n");
+  fprintf(stderr, " script [options] [file]\n");
+  fprintf(stderr, "Options:\n");
+  fprintf(stderr, " -a, --append            append the output\n");
+  fprintf(stderr, " -c, --command <command> run command rather than interactive shell\n");
+  fprintf(stderr, " -r, --return            return exit code of the child process\n");
+  fprintf(stderr, " -f, --flush             run flush after each write\n");
+  fprintf(stderr, "     --force             use output file even when it is a link\n");
+  fprintf(stderr, " -q, --quiet             be quiet\n");
+  fprintf(stderr, " -t, --timing[=<file>]   output timing data to stderr (or to FILE)\n");
+  fprintf(stderr, " -V, --version           output version information and exit\n");
+  fprintf(stderr, " -h, --help              display this help and exit\n");
   return (1);
 }
 
@@ -62,7 +72,7 @@ int			parse_opt(int ac, char **av, char **envp, t_script *script)
   c = 0;
   while (c != -1)
     {
-      c = getopt_long(ac, av, "ac:efqt::vh", options, &option_index);
+      c = getopt_long(ac, av, "ac: efqt::vh", options, &option_index);
       script->append |= (c == 'a');
       script->returnex |= (c == 'e');
       script->flush |= (c == 'f');
