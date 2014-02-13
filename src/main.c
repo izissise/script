@@ -108,6 +108,11 @@ pid_t	my_forkpty(t_script *s, int master, int slave, struct termios* t)
           close(slave);
           return (1);
         }
+        //open file append ?
+        //write stuff if not quiet
+        //while read
+        //write stuff if not quiet
+        //close
     }
   else if (child == 0)
     {
