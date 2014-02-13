@@ -11,10 +11,24 @@
 #ifndef INCLUDE_H_INCLUDED
 # define INCLUDE_H_INCLUDED
 
+# define _GNU_SOURCE
+# define _XOPEN_SOURCE
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
 # include <getopt.h>
+# include <sys/types.h>
+# include <sys/stat.h>
+# include <fcntl.h>
+# include <errno.h>
+# include <termios.h>
+# include <unistd.h>
+# include <pty.h>
+
+# define SETFLAG(x, y) (x) |= (y)
+# define UNSETFLAG(x, y) (x) &= ~(y)
+# define SWITCHFLAG(x, y) (x) ^= (y)
+# define GETFLAG(x, y) (x) & (y)
 
 typedef struct	s_script
 {
