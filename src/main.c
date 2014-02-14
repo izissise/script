@@ -22,7 +22,29 @@ int	retransmit(int in, int out1, int out2)
     }
   if (read_ret == -1)
     {
-      perror(NULL);
+      perror("retransmits");
+      return (1);
+    }
+  return (0);
+}
+
+int	read_input_ret(t_script *s)
+{
+  pid_t	child;
+  int	ret;
+  int	waitret;
+
+  waitret = 0;
+  child = fork();
+  if (child > 0)
+    {
+      while ((waitret = waitpid(child, &ret, WNOHANG)) == 0)
+        retransmit(0, s->slavefd, -1);
+      return (0);
+    }
+  else if (child != 0 || waitret == -1)
+    {
+      perror("read input ret");
       return (1);
     }
   return (0);
@@ -41,15 +63,16 @@ int	open_and_transmit(t_script *s, pid_t shellpid)
     {
       if (!s->quiet)
         dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
+      read_input_ret(s);
       while ((waitret = waitpid(shellpid, &(s->retvalue), WNOHANG)) == 0)
         retransmit(s->masterfd, file, 1);
-      close(file);
       if (!s->quiet)
         dprintf(STDERR_FILENO, "Script done, file is %s\n", s->file);
+      close(file);
       if (waitret != -1)
         return (0);
     }
-  perror(NULL);
+  perror("open_and_trans");
   return (1);
 }
 
@@ -66,14 +89,10 @@ pid_t	my_forkpty(t_script *s, struct termios *t)
     }
   else if (child == 0)
     {
-
-      child2 = fork();
-      if (child2)
-        {
-        }
       close(s->masterfd);
       if (!(my_login_tty(s->slavefd) || init_term(t, s->slavefd)))
-        execlp(s->shell, s->shell);
+        { //execlp(s->shell, s->shell);
+        }
       perror(NULL);
       exit(-1);
       close(s->slavefd);
@@ -99,16 +118,6 @@ int	main(int ac, char *av[], char *env[])
   script.slavefd = slave_fd;
   if ((my_forkpty(&script, &t)) == 0)
     return (1);
-  /*printf("shell: %s, file: %s, append: %d, returnex: %d, flush: %d, force: %d, quiet: %d, timing: %d\n",
-          script.shell,
-          script.file,
-          script.append,
-          script.returnex,
-          script.flush,
-          script.force,
-          script.quiet,
-          script.timing
-         );*/
   tcsetattr(master_fd, TCSANOW, &t);
   close(master_fd);
   close(slave_fd);
