@@ -47,18 +47,25 @@ void	init_opt(char **envp, t_script *script, struct option *opt)
 
 int		help()
 {
-  fprintf(stderr, "Usage:\n");
-  fprintf(stderr, " script [options] [file]\n");
-  fprintf(stderr, "Options:\n");
-  fprintf(stderr, " -a, --append            append the output\n");
-  fprintf(stderr, " -c, --command <command> run command rather than interactive shell\n");
-  fprintf(stderr, " -r, --return            return exit code of the child process\n");
-  fprintf(stderr, " -f, --flush             run flush after each write\n");
-  fprintf(stderr, "     --force             use output file even when it is a link\n");
-  fprintf(stderr, " -q, --quiet             be quiet\n");
-  fprintf(stderr, " -t, --timing[=<file>]   output timing data to stderr (or to FILE)\n");
-  fprintf(stderr, " -V, --version           output version information and exit\n");
-  fprintf(stderr, " -h, --help              display this help and exit\n");
+  dprintf(STDERR_FILENO, "Usage:\n");
+  dprintf(STDERR_FILENO, " script [options] [file]\n");
+  dprintf(STDERR_FILENO, "Options:\n");
+  dprintf(STDERR_FILENO, " -a, --append            append the output\n");
+  dprintf(STDERR_FILENO, " -c, --command <command> run command rather than int"
+          "eractive shell\n");
+  dprintf(STDERR_FILENO, " -r, --return            return exit code of the chi"
+          "ld process\n");
+  dprintf(STDERR_FILENO, " -f, --flush             run flush after each write"
+          "\n");
+  dprintf(STDERR_FILENO, "     --force             use output file even when i"
+          "t is a link\n");
+  dprintf(STDERR_FILENO, " -q, --quiet             be quiet\n");
+  dprintf(STDERR_FILENO, " -t, --timing[=<file>]   output timing data to stder"
+          "r (or to FILE)\n");
+  dprintf(STDERR_FILENO, " -V, --version           output version information "
+          "and exit\n");
+  dprintf(STDERR_FILENO, " -h, --help              display this help and exit"
+          "\n");
   return (1);
 }
 
