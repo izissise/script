@@ -10,7 +10,9 @@
 
 SRC		=	main.c \
 			envvar.c \
-			opt.c
+			opt.c \
+			pty.c \
+			term.c
 
 CC		=	gcc
 

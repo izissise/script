@@ -41,10 +41,18 @@ typedef struct	s_script
   char		quiet;
   char		timing;
   char		*timingout;
+  int		masterfd;
+  int		slavefd;
+  int		retvalue;
 }		t_script;
 
 char	*get_envvar(char *var, char **env);
-
 int	parse_opt(int ac, char **av, char **envp, t_script *script);
+char	*my_ptsname(int fd);
+int	my_grantpt(int fd);
+int	my_unlockpt(int fd);
+int	my_openpty(int *amaster, int *aslave);
+int	my_login_tty(int slave);
+int	init_term(struct termios *cpy, int ttyout);
 
 #endif // INCLUDE_H_INCLUDED
