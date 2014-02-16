@@ -25,11 +25,7 @@
 # include <termios.h>
 # include <unistd.h>
 # include <pty.h>
-
-# define SETFLAG(x, y) (x) |= (y)
-# define UNSETFLAG(x, y) (x) &= ~(y)
-# define SWITCHFLAG(x, y) (x) ^= (y)
-# define GETFLAG(x, y) (x) & (y)
+# include <time.h>
 
 typedef struct	s_script
 {
@@ -60,5 +56,6 @@ int	init_term(struct termios *cpy, int ttyout);
 int	open_files(t_script *s);
 int	close_files(t_script *s);
 void	exec_command(char *cmd);
+int	io_handling(t_script *s, pid_t shellpid);
 
 #endif // INCLUDE_H_INCLUDED

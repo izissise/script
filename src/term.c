@@ -13,26 +13,18 @@
 int			init_term(struct termios *cpy, int ttyout)
 {
   struct termios	t;
-  int			i;
 
-  i = -1;
   if (tcgetattr(ttyout, cpy) != -1)
     {
-      t.c_iflag = cpy->c_iflag;
-      t.c_oflag = cpy->c_oflag;
-      t.c_cflag = cpy->c_cflag;
-      t.c_lflag = cpy->c_lflag;
-      t.c_line = cpy->c_line;
-      while (i++ < NCCS)
-        t.c_cc[i] = cpy->c_cc[i];
-      t.c_ispeed = cpy->c_ispeed;
-      t.c_ospeed = cpy->c_ospeed;
-      UNSETFLAG(t.c_lflag, (ECHO | ICANON));
-      t.c_cc[VTIME] = 100;
+      t.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON);
+      t.c_oflag &= ~OPOST;
+      t.c_lflag &= ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN);
+      t.c_cflag &= ~(CSIZE | PARENB);
+      t.c_cflag |= CS8;
+      t.c_lflag &= ~ECHO;
       if (tcsetattr(ttyout, TCSANOW, &t) != -1)
         return (0);
     }
   perror(NULL);
-  close(ttyout);
   return (1);
 }

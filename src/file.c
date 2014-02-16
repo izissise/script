@@ -13,14 +13,22 @@
 int	open_files(t_script *s)
 {
   int	oopt;
+  time_t	ctime;
+  char	timebuff[4096];
 
-  oopt = O_WRONLY | O_CREAT | (s->append ? O_APPEND : 0);
+  oopt = O_WRONLY | O_CREAT | (s->append ? O_APPEND : O_TRUNC);
   if (((s->filefd = open(s->file, oopt, 0666)) != -1)
       && (1))
     {
       //open also timing and output start date
       if (!s->quiet)
-        dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
+        {
+          dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
+          ctime = time(NULL);
+          strftime(timebuff, sizeof(timebuff), "Script started on %c\n",
+                   localtime(&ctime));
+          write(s->filefd, timebuff, strlen(timebuff));
+        }
       return (0);
     }
   perror("open_files");

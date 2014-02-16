@@ -16,9 +16,9 @@ char	*my_ptsname(int fd)
   char	pts_name[30];
 
   if (ioctl(fd, TIOCGPTN, &sminor) < 0)
-    return(NULL);
+    return (NULL);
   snprintf(pts_name, sizeof(pts_name), "/dev/pts/%d", sminor);
-  return(strdup(pts_name));
+  return (strdup(pts_name));
 }
 
 int	my_grantpt(int fd)
@@ -56,9 +56,9 @@ int	my_openpty(int *amaster, int *aslave)
       return (0);
     }
   free(slave_name);
+  perror(NULL);
   close(*amaster);
   close(*aslave);
-  perror(NULL);
   return (1);
 }
 

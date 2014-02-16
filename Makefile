@@ -14,7 +14,8 @@ SRC		=	main.c \
 			pty.c \
 			term.c \
 			file.c \
-			exec.c
+			exec.c \
+			io.c
 
 CC		=	gcc
 
