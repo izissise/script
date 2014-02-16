@@ -18,7 +18,8 @@ int	retransmit(int in, int out1, int out2)
   while ((read_ret = read(in, buff, 4096)) > 0)
     {
       write(out1, buff, read_ret);
-      write(out2, buff, read_ret);
+      if (out2 != -1)
+        write(out2, buff, read_ret);
     }
   if (read_ret == -1)
     {
@@ -28,70 +29,37 @@ int	retransmit(int in, int out1, int out2)
   return (0);
 }
 
-int	read_input_ret(t_script *s)
-{
-  pid_t	child;
-  int	ret;
-  int	waitret;
-
-  waitret = 0;
-  child = fork();
-  if (child > 0)
-    {
-      while ((waitret = waitpid(child, &ret, WNOHANG)) == 0)
-        retransmit(0, s->slavefd, -1);
-      return (0);
-    }
-  else if (child != 0 || waitret == -1)
-    {
-      perror("read input ret");
-      return (1);
-    }
-  return (0);
-}
-
-int	open_and_transmit(t_script *s, pid_t shellpid)
-{
-  int	file;
-  int	timingfd;
-  int	oopt;
-  int	waitret;
-
-  oopt = O_WRONLY | O_CREAT | (s->append ? O_APPEND : 0);
-  if (((file = open(s->file, oopt, 0666)) != -1)
-      && (1))
-    {
-      if (!s->quiet)
-        dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
-      read_input_ret(s);
-      while ((waitret = waitpid(shellpid, &(s->retvalue), WNOHANG)) == 0)
-        retransmit(s->masterfd, file, 1);
-      if (!s->quiet)
-        dprintf(STDERR_FILENO, "Script done, file is %s\n", s->file);
-      close(file);
-      if (waitret != -1)
-        return (0);
-    }
-  perror("open_and_trans");
-  return (1);
-}
-
 pid_t	my_forkpty(t_script *s, struct termios *t)
 {
-  pid_t	child;
-  pid_t	child2;
+  pid_t	shellpid;
+  pid_t	childio;
+  int	waitret;
 
-  child = fork();
-  if (child > 0)
+  shellpid = fork();
+  if (shellpid > 0)
     {
-      if (open_and_transmit(s, child))
+      if (open_files(s))
         return (1);
+
+      childio = fork();
+      if (childio > 0)
+        {
+          while ((waitret = waitpid(shellpid, &(s->retvalue), WNOHANG)) == 0)
+            retransmit(s->masterfd, s->filefd, 1);
+          waitret = waitpid(childio, &waitret, 0);
+        }
+      else
+        {
+          retransmit(0, s->slavefd, -1);
+        }
     }
-  else if (child == 0)
+  else if (shellpid == 0)
     {
       close(s->masterfd);
       if (!(my_login_tty(s->slavefd) || init_term(t, s->slavefd)))
-        { //execlp(s->shell, s->shell);
+        {
+          //close(s->slavefd);
+          exec_command(s->shell);
         }
       perror(NULL);
       exit(-1);
@@ -102,7 +70,7 @@ pid_t	my_forkpty(t_script *s, struct termios *t)
       perror(NULL);
       return (0);
     }
-  return (child);
+  return (shellpid);
 }
 
 int	main(int ac, char *av[], char *env[])

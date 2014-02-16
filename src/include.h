@@ -45,6 +45,8 @@ typedef struct	s_script
   int		masterfd;
   int		slavefd;
   int		retvalue;
+  int		filefd;
+  int		timingfd;
 }		t_script;
 
 char	*get_envvar(char *var, char **env);
@@ -55,5 +57,8 @@ int	my_unlockpt(int fd);
 int	my_openpty(int *amaster, int *aslave);
 int	my_login_tty(int slave);
 int	init_term(struct termios *cpy, int ttyout);
+int	open_files(t_script *s);
+int	close_files(t_script *s);
+void	exec_command(char *cmd);
 
 #endif // INCLUDE_H_INCLUDED

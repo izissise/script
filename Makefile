@@ -12,7 +12,9 @@ SRC		=	main.c \
 			envvar.c \
 			opt.c \
 			pty.c \
-			term.c
+			term.c \
+			file.c \
+			exec.c
 
 CC		=	gcc
 
