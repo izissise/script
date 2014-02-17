@@ -23,12 +23,13 @@ void	shell(t_script *s, struct termios *t)
   close(s->slavefd);
   close_files(s);
   perror(NULL);
-  exit(-1);
+  exit(1);
 }
 
 pid_t	my_forkpty(t_script *s, struct termios *t)
 {
   pid_t	shellpid;
+  int	ret;
 
   shellpid = fork();
   if (shellpid > 0)
@@ -36,7 +37,11 @@ pid_t	my_forkpty(t_script *s, struct termios *t)
       if (open_files(s))
         return (1);
       else
-        return (io_handling(s, shellpid));
+        {
+          io_handling(s);
+          ret = waitpid(shellpid, &(s->retvalue), 0);
+          return (0);
+        }
     }
   else if (shellpid == 0)
     shell(s, t);
@@ -59,10 +64,9 @@ int	main(int ac, char *av[], char *env[])
     return (1);
   script.masterfd = master_fd;
   script.slavefd = slave_fd;
-  if ((my_forkpty(&script, &t)))
+  if ((tcgetattr(slave_fd, &t) == -1) || my_forkpty(&script, &t))
     return (1);
   tcsetattr(master_fd, TCSANOW, &t);
   close(master_fd);
-  close(slave_fd);
   return (0);
 }

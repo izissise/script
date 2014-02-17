@@ -12,7 +12,6 @@
 # define INCLUDE_H_INCLUDED
 
 # define _GNU_SOURCE
-# define _XOPEN_SOURCE
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
@@ -20,6 +19,7 @@
 # include <sys/types.h>
 # include <sys/stat.h>
 # include <sys/wait.h>
+# include <sys/select.h>
 # include <fcntl.h>
 # include <errno.h>
 # include <termios.h>
@@ -56,6 +56,6 @@ int	init_term(struct termios *cpy, int ttyout);
 int	open_files(t_script *s);
 int	close_files(t_script *s);
 void	exec_command(char *cmd);
-int	io_handling(t_script *s, pid_t shellpid);
+int	io_handling(t_script *s);
 
 #endif // INCLUDE_H_INCLUDED
