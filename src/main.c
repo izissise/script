@@ -64,5 +64,7 @@ int	main(int ac, char *av[], char *env[])
   tcsetattr(master_fd, TCSANOW, &t);
   close(master_fd);
   close(slave_fd);
+  if (script.returnex)
+    return (WEXITSTATUS(script.retvalue));
   return (0);
 }
