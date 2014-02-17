@@ -10,16 +10,20 @@
 
 #include "include.h"
 
-int	retransmit(int in, int out1, int out2)
+int	retransmit(int in, int out1, int out2, int flush)
 {
   int	read_ret;
   char	buff[4096];
 
-  while ((read_ret = read(in, buff, 4096)) > 0)
+  while ((read_ret = read(in, buff, sizeof(buff))) > 0)
     {
       write(out1, buff, read_ret);
       if (out2 != -1)
         write(out2, buff, read_ret);
+      if (flush)
+        fsync(out1);
+      if (flush && out2 != -1)
+        fsync(out2);
     }
   if (read_ret == -1)
     {
@@ -38,7 +42,7 @@ int	io_handling(t_script *s, pid_t shellpid)
   if (childio > 0)
     {
       close(s->slavefd);
-      retransmit(s->masterfd, s->filefd, 1);
+      retransmit(s->masterfd, s->filefd, 1, s->flush);
       printf("waiting\n");
       waitret = waitpid(childio, &waitret, 0);
       waitret = waitpid(shellpid, &(s->retvalue), 0);
@@ -47,7 +51,7 @@ int	io_handling(t_script *s, pid_t shellpid)
     }
   else if (childio == 0)
     {
-      retransmit(0, s->masterfd, -1);
+      retransmit(0, s->masterfd, s->filefd, s->flush);
       close(s->slavefd);
       close(s->masterfd);
       close(s->filefd);
@@ -61,3 +65,4 @@ int	io_handling(t_script *s, pid_t shellpid)
     }
   return (0);
 }
+

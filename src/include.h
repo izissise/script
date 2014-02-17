@@ -26,6 +26,7 @@
 # include <unistd.h>
 # include <pty.h>
 # include <time.h>
+# include <paths.h>
 
 typedef struct	s_script
 {

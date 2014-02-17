@@ -30,7 +30,7 @@ void	init_opt(char **envp, t_script *script, struct option *opt)
   script->quiet = 0;
   script->timing = 0;
   script->timingout = NULL;
-  script->shell = "/bin/sh";
+  script->shell = _PATH_BSHELL;
   if ((tmp = get_envvar("SHELL", envp)))
     script->shell = tmp;
   init_single_opt(&(opt[0]), "append", no_argument, 'a');
