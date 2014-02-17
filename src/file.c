@@ -28,8 +28,8 @@ int		check_symlink(t_script *s, char *file)
     return (0);
   if (lstat(file, &sn) == 0 && (S_ISLNK(sn.st_mode) || sn.st_nlink > 1))
     {
-      fprintf(stderr, "output file `%s' is a link\nUse --force if you really w"
-              "ant to use it.\nProgram not started.", file);
+      dprintf(STDERR_FILENO, "Output file `%s' is a link\nUse --force if you r"
+              "eally want to use it.\nProgram not started.", file);
       return (1);
     }
   return (0);

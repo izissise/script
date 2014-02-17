@@ -22,14 +22,8 @@ void	init_opt(char **envp, t_script *script, struct option *opt)
 {
   char	*tmp;
 
+  memset(script, 0, sizeof(t_script));
   script->file = "typescript";
-  script->returnex = 0;
-  script->append = 0;
-  script->flush = 0;
-  script->force = 0;
-  script->quiet = 0;
-  script->timing = 0;
-  script->timingout = NULL;
   script->shell = _PATH_BSHELL;
   if ((tmp = get_envvar("SHELL", envp)))
     script->shell = tmp;
@@ -90,7 +84,7 @@ int			parse_opt(int ac, char **av, char **envp, t_script *script)
       if (c == 'v' || c == 'h')
         return (help());
       if (c == 'c')
-        script->shell = optarg;
+        script->cmd = optarg;
     }
   if (optind != ac)
     script->file = av[optind];

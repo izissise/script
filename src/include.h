@@ -31,6 +31,7 @@
 typedef struct	s_script
 {
   char		*shell;
+  char		*cmd;
   char		*file;
   char		append;
   char		returnex;
@@ -56,7 +57,7 @@ int	my_login_tty(int slave);
 int	init_term(struct termios *cpy, int ttyout);
 int	open_files(t_script *s);
 int	close_files(t_script *s);
-void	exec_command(char *cmd);
+void	exec_command(char *shell, char *cmd);
 int	io_handling(t_script *s, pid_t shellpid);
 
 #endif // INCLUDE_H_INCLUDED

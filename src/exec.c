@@ -10,11 +10,14 @@
 
 #include "include.h"
 
-void	exec_command(char *cmd)
+void	exec_command(char *shell, char *cmd)
 {
-  char	*cmdname;
+  char	*shellname;
 
-  cmdname = strrchr(cmd, '/');
-  cmdname = cmdname ? (&(cmdname[1])) : cmd;
-  execlp(cmdname, cmd, NULL);
+  shellname = strrchr(shell, '/');
+  shellname = shellname ? (&(shellname[1])) : shell;
+  if (cmd)
+    execl(shell, shellname, "-c", cmd, NULL);
+  else
+    execl(shell, shellname, "-i", NULL);
 }

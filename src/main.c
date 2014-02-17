@@ -13,15 +13,15 @@
 void	shell(t_script *s, struct termios *t)
 {
   close(s->masterfd);
+  close(s->filefd);
   setsid();
   ioctl(s->slavefd, TIOCSCTTY, 1);
   if (!(my_login_tty(s->slavefd) || init_term(t, s->slavefd)))
     {
       close(s->slavefd);
-      exec_command(s->shell);
+      exec_command(s->shell, s->cmd);
     }
   close(s->slavefd);
-  close_files(s);
   perror(NULL);
   exit(-1);
 }

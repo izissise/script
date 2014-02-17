@@ -13,7 +13,7 @@
 char	*my_ptsname(int fd)
 {
   int	sminor;
-  char	pts_name[30];
+  char	pts_name[40];
 
   if (ioctl(fd, TIOCGPTN, &sminor) < 0)
     return (NULL);
