@@ -13,11 +13,11 @@
 void	shell(t_script *s, struct termios *t)
 {
   close(s->masterfd);
+  setsid();
+  ioctl(s->slavefd, TIOCSCTTY, 1);
   if (!(my_login_tty(s->slavefd) || init_term(t, s->slavefd)))
     {
       close(s->slavefd);
-      setsid();
-      ioctl(0, TIOCSCTTY, 1);
       exec_command(s->shell);
     }
   close(s->slavefd);
@@ -26,7 +26,7 @@ void	shell(t_script *s, struct termios *t)
   exit(-1);
 }
 
-pid_t	my_forkpty(t_script *s, struct termios *t)
+int	my_forkpty(t_script *s, struct termios *t)
 {
   pid_t	shellpid;
 

@@ -20,6 +20,21 @@ void	output_time(char *format, int fd)
   write(fd, timebuff, strlen(timebuff));
 }
 
+int		check_symlink(t_script *s, char *file)
+{
+  struct stat	sn;
+
+  if (s->force)
+    return (0);
+  if (lstat(file, &sn) == 0 && (S_ISLNK(sn.st_mode) || sn.st_nlink > 1))
+    {
+      fprintf(stderr, "output file `%s' is a link\nUse --force if you really w"
+              "ant to use it.\nProgram not started.", file);
+      return (1);
+    }
+  return (0);
+}
+
 int	open_files(t_script *s)
 {
   int	oopt;
@@ -28,7 +43,9 @@ int	open_files(t_script *s)
   if (((s->filefd = open(s->file, oopt, 0666)) != -1)
       && (1))
     {
-      //open also timing and output start date
+      if (check_symlink(s, s->file) || check_symlink(s, s->timingout))
+        return (1);
+      //open also timing
       output_time("Script started on %c\n", s->filefd);
       if (!s->quiet)
         dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
@@ -40,7 +57,7 @@ int	open_files(t_script *s)
 
 int	close_files(t_script *s)
 {
-  //close also timing and output end date
+  //close also timing
   if (!s->quiet)
     {
       dprintf(STDERR_FILENO, "Script done, file is %s\n", s->file);
