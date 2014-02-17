@@ -23,7 +23,7 @@ int	retransmit(int in, int out1, int out2)
     }
   if (read_ret == -1)
     {
-      perror("retransmits");
+      perror(NULL);
       return (1);
     }
   return (0);
@@ -48,7 +48,6 @@ int	io_handling(t_script *s, pid_t shellpid)
   else if (childio == 0)
     {
       retransmit(0, s->masterfd, -1);
-      ioctl(s->slavefd, );
       close(s->slavefd);
       close(s->masterfd);
       close(s->filefd);
