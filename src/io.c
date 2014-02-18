@@ -47,7 +47,7 @@ int	io_handling(t_script *s)
       if (select(s->masterfd + 1, &selectfd, NULL, NULL, NULL) == -1)
         break;
       if (FD_ISSET(0, &selectfd))
-        retransmit(0, s->masterfd, -1, s->flush);
+        retransmit(0, s->masterfd, s->filefd, s->flush);
       else if (FD_ISSET(s->masterfd, &selectfd))
         retransmit(s->masterfd, s->filefd, 1, s->flush);
     }
