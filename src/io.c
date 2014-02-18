@@ -25,6 +25,7 @@ int	retransmit(int in, int out1, int out2, int flush)
         fsync(out1);
       if (flush && out2 != -1)
         fsync(out2);
+      return (read_ret);
     }
   else if (read_ret == -1)
     {
@@ -34,13 +35,28 @@ int	retransmit(int in, int out1, int out2, int flush)
   return (0);
 }
 
+void	calc_timing(t_script *s, clock_t *start, clock_t *end, int nbread)
+{
+  if (s->timing && nbread > 0)
+    {
+      *end = clock();
+      dprintf(s->timingfd, "%f %d\n",
+              (double)((double)*end - (double)*start) / CLOCKS_PER_SEC, nbread);
+      *start = *end;
+    }
+}
+
 int	io_handling(t_script *s)
 {
   fd_set	selectfd;
+  clock_t	start;
+  clock_t	end;
+  int	nbread;
 
   close(s->slavefd);
   while (1)
     {
+      start = clock();
       FD_ZERO(&selectfd);
       FD_SET(0, &selectfd);
       FD_SET(s->masterfd, &selectfd);
@@ -49,7 +65,10 @@ int	io_handling(t_script *s)
       if (FD_ISSET(0, &selectfd))
         retransmit(0, s->masterfd, s->filefd, s->flush);
       else if (FD_ISSET(s->masterfd, &selectfd))
-        retransmit(s->masterfd, s->filefd, 1, s->flush);
+        {
+          nbread = retransmit(s->masterfd, s->filefd, 1, s->flush);
+          calc_timing(s, &start, &end, nbread);
+        }
     }
   close_files(s);
   return (0);
