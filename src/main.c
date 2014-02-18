@@ -50,11 +50,11 @@ int	my_forkpty(t_script *s, struct termios *t)
   return (0);
 }
 
-int	main(int ac, char *av[], char *env[])
+int			main(int ac, char *av[], char *env[])
 {
-  t_script	script;
-  int		master_fd;
-  int		slave_fd;
+  t_script		script;
+  int			master_fd;
+  int			slave_fd;
   struct termios	t;
 
   if (parse_opt(ac, av, env, &script) || my_openpty(&master_fd, &slave_fd))

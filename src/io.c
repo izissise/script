@@ -37,8 +37,8 @@ int	retransmit(int in, int out1, int out2, int flush)
   return (0);
 }
 
-void	calc_timing(t_script *s, struct timespec *start,
-                  struct timespec *end, int nbread)
+void		calc_timing(t_script *s, struct timespec *start,
+                    struct timespec *end, int nbread)
 {
   size_t	elapsed;
 
@@ -54,7 +54,7 @@ void	calc_timing(t_script *s, struct timespec *start,
 
 int			io_handling(t_script *s, pid_t shellpid)
 {
-  fd_set			selectfd;
+  fd_set		selectfd;
   struct timespec	start;
   struct timespec	end;
   int			nbread;
