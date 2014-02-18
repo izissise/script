@@ -13,7 +13,7 @@
 int	retransmit(int in, int out1, int out2, int flush)
 {
   int	read_ret;
-  char	buff[10];
+  char	buff[4096];
 
   read_ret = read(in, buff, sizeof(buff));
   if (read_ret > 0)

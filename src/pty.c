@@ -38,7 +38,7 @@ int	my_unlockpt(int fd)
   int	lock;
 
   lock = 0;
-  return ioctl(fd, TIOCSPTLCK, &lock);
+  return (ioctl(fd, TIOCSPTLCK, &lock));
 }
 
 int	my_openpty(int *amaster, int *aslave)
