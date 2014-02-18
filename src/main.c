@@ -10,13 +10,13 @@
 
 #include "include.h"
 
-void	shell(t_script *s, struct termios *t)
+void	shell(t_script *s)
 {
   close(s->masterfd);
   close(s->filefd);
   setsid();
   ioctl(s->slavefd, TIOCSCTTY, 1);
-  if (!(my_login_tty(s->slavefd) || init_term(t, s->slavefd)))
+  if (!my_login_tty(s->slavefd))
     {
       close(s->slavefd);
       exec_command(s->shell, s->cmd);
@@ -35,15 +35,13 @@ int	my_forkpty(t_script *s, struct termios *t)
     {
       if (open_files(s))
         return (1);
-      else
-        {
-          io_handling(s);
-          waitpid(shellpid, &(s->retvalue), 0);
-          return (0);
-        }
+      init_term(t, 0);
+      io_handling(s, shellpid);
+      close_files(s);
+      return (0);
     }
   else if (shellpid == 0)
-    shell(s, t);
+    shell(s);
   else
     {
       perror(NULL);
@@ -65,7 +63,7 @@ int	main(int ac, char *av[], char *env[])
   script.slavefd = slave_fd;
   if ((tcgetattr(slave_fd, &t) == -1) || my_forkpty(&script, &t))
     return (1);
-  tcsetattr(master_fd, TCSANOW, &t);
+  tcsetattr(0, TCSANOW, &t);
   close(master_fd);
   close(slave_fd);
   if (script.returnex)

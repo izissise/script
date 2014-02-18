@@ -50,7 +50,7 @@ void	calc_timing(t_script *s, struct timespec *start,
     }
 }
 
-int			io_handling(t_script *s)
+int			io_handling(t_script *s, pid_t shellpid)
 {
   fd_set			selectfd;
   struct timespec	start;
@@ -67,14 +67,14 @@ int			io_handling(t_script *s)
       if (select(s->masterfd + 1, &selectfd, NULL, NULL, NULL) == -1)
         break;
       if (FD_ISSET(0, &selectfd))
-        retransmit(0, s->masterfd, s->filefd, s->flush);
+        retransmit(0, s->masterfd, -1, s->flush);
       else if (FD_ISSET(s->masterfd, &selectfd))
         {
           nbread = retransmit(s->masterfd, s->filefd, 1, s->flush);
           calc_timing(s, &start, &end, nbread);
         }
+      if (waitpid(shellpid, &(s->retvalue), WNOHANG) > 0)
+        break;
     }
-  close_files(s);
   return (0);
 }
-
