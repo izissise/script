@@ -13,9 +13,10 @@
 int	retransmit(int in, int out1, int out2, int flush)
 {
   int	read_ret;
-  char	buff[4096];
+  char	buff[10];
 
-  while ((read_ret = read(in, buff, sizeof(buff))) > 0)
+  read_ret = read(in, buff, sizeof(buff));
+  if (read_ret > 0)
     {
       write(out1, buff, read_ret);
       if (out2 != -1)
@@ -25,7 +26,7 @@ int	retransmit(int in, int out1, int out2, int flush)
       if (flush && out2 != -1)
         fsync(out2);
     }
-  if (read_ret == -1)
+  else if (read_ret == -1)
     {
       perror(NULL);
       return (1);
@@ -33,36 +34,24 @@ int	retransmit(int in, int out1, int out2, int flush)
   return (0);
 }
 
-int	io_handling(t_script *s, pid_t shellpid)
+int	io_handling(t_script *s)
 {
-  pid_t	childio;
-  int	waitret;
+  fd_set	selectfd;
 
-  childio = fork();
-  if (childio > 0)
+  close(s->slavefd);
+  while (1)
     {
-      close(s->slavefd);
-      retransmit(s->masterfd, s->filefd, 1, s->flush);
-      printf("waiting\n");
-      waitret = waitpid(childio, &waitret, 0);
-      waitret = waitpid(shellpid, &(s->retvalue), 0);
-      close(s->masterfd);
-      close_files(s);
+      FD_ZERO(&selectfd);
+      FD_SET(0, &selectfd);
+      FD_SET(s->masterfd, &selectfd);
+      if (select(s->masterfd + 1, &selectfd, NULL, NULL, NULL) == -1)
+        break;
+      if (FD_ISSET(0, &selectfd))
+        retransmit(0, s->masterfd, -1, s->flush);
+      else if (FD_ISSET(s->masterfd, &selectfd))
+        retransmit(s->masterfd, s->filefd, 1, s->flush);
     }
-  else if (childio == 0)
-    {
-      retransmit(0, s->masterfd, s->filefd, s->flush);
-      close(s->slavefd);
-      close(s->masterfd);
-      close(s->filefd);
-      printf("bye\n");
-      exit(0);
-    }
-  else
-    {
-      perror(NULL);
-      return (1);
-    }
+  close_files(s);
   return (0);
 }
 
