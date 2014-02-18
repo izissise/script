@@ -17,7 +17,7 @@ void	output_time(char *format, int fd)
 
   ctime = time(NULL);
   strftime(timebuff, sizeof(timebuff), format, localtime(&ctime));
-  write(fd, timebuff, strlen(timebuff));
+  dprintf(fd, "%s", timebuff);
 }
 
 int		check_symlink(t_script *s, char *file)

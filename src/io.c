@@ -13,21 +13,23 @@
 int	retransmit(int in, int out1, int out2, int flush)
 {
   int	read_ret;
+  int	write_ret;
   char	buff[4096];
 
   read_ret = read(in, buff, sizeof(buff));
+  write_ret = 0;
   if (read_ret > 0)
     {
-      write(out1, buff, read_ret);
+      write_ret = write(out1, buff, read_ret);
       if (out2 != -1)
-        write(out2, buff, read_ret);
+        write_ret = write(out2, buff, read_ret);
       if (flush)
         fsync(out1);
       if (flush && out2 != -1)
         fsync(out2);
       return (read_ret);
     }
-  else if (read_ret == -1)
+  else if (read_ret == -1 || write_ret == -1)
     {
       perror(NULL);
       return (1);
