@@ -27,7 +27,8 @@ int	my_grantpt(int fd)
   int	ret;
 
   name = my_ptsname(fd);
-  ret = (chmod(name, S_IRUSR | S_IWUSR | S_IWGRP));
+  ret = chmod(name, S_IRUSR | S_IWUSR | S_IWGRP);
+  ret |= chown(name, getuid(), -1);
   free(name);
   return (ret);
 }
