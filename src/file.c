@@ -24,7 +24,7 @@ int		check_symlink(t_script *s, char *file)
 {
   struct stat	sn;
 
-  if (s->force)
+  if (s->force || file == NULL)
     return (0);
   if (lstat(file, &sn) == 0 && (S_ISLNK(sn.st_mode) || sn.st_nlink > 1))
     {
@@ -40,12 +40,12 @@ int	open_files(t_script *s)
   int	oopt;
 
   oopt = O_WRONLY | O_CREAT | (s->append ? O_APPEND : O_TRUNC);
-  if (((s->filefd = open(s->file, oopt, 0666)) != -1)
-      && (1))
+  if (check_symlink(s, s->file) || check_symlink(s, s->timingout))
+    return (1);
+  if (s->timing)
+    s->timingfd = open(s->timingout, oopt, 0666);
+  if ((s->timingfd != -1) && ((s->filefd = open(s->file, oopt, 0666)) != -1))
     {
-      if (check_symlink(s, s->file) || check_symlink(s, s->timingout))
-        return (1);
-      //open also timing
       output_time("Script started on %c\n", s->filefd);
       if (!s->quiet)
         dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
@@ -57,12 +57,13 @@ int	open_files(t_script *s)
 
 int	close_files(t_script *s)
 {
-  //close also timing
   if (!s->quiet)
     {
       dprintf(STDERR_FILENO, "Script done, file is %s\n", s->file);
       output_time("Script finished on %c\n", s->filefd);
     }
+  if (s->timing)
+    close(s->timingfd);
   if (close(s->filefd) == -1)
     {
       perror("close_files");
