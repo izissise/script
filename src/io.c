@@ -35,28 +35,32 @@ int	retransmit(int in, int out1, int out2, int flush)
   return (0);
 }
 
-void	calc_timing(t_script *s, clock_t *start, clock_t *end, int nbread)
+void	calc_timing(t_script *s, struct timespec *start,
+                  struct timespec *end, int nbread)
 {
+  size_t	elapsed;
+
   if (s->timing && nbread > 0)
     {
-      *end = clock();
-      dprintf(s->timingfd, "%f %d\n",
-              (double)((double)*end - (double)*start) / CLOCKS_PER_SEC, nbread);
+      clock_gettime(CLOCK_PROCESS_CPUTIME_ID, end);
+      elapsed = (end->tv_sec - start->tv_sec) * 1000000000
+                + (end->tv_nsec - start->tv_nsec);
+      dprintf(s->timingfd, "%f %d\n", ((elapsed) / 1000000000.0), nbread);
       *start = *end;
     }
 }
 
-int	io_handling(t_script *s)
+int			io_handling(t_script *s)
 {
-  fd_set	selectfd;
-  clock_t	start;
-  clock_t	end;
-  int	nbread;
+  fd_set			selectfd;
+  struct timespec	start;
+  struct timespec	end;
+  int			nbread;
 
   close(s->slavefd);
   while (1)
     {
-      start = clock();
+      clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
       FD_ZERO(&selectfd);
       FD_SET(0, &selectfd);
       FD_SET(s->masterfd, &selectfd);
