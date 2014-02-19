@@ -43,13 +43,13 @@ int	open_files(t_script *s)
   if (check_symlink(s, s->file) || check_symlink(s, s->timingout))
     return (1);
   if (s->timing)
-    s->timingfd = (s->timingout != NULL) ? (open(s->timingout, oopt, 0666))
+    s->timingfd = (s->timingout != NULL) ? (open(s->timingout, oopt, 0664))
                   : STDERR_FILENO;
-  if ((s->timingfd != -1) && ((s->filefd = open(s->file, oopt, 0666)) != -1))
+  if ((s->timingfd != -1) && ((s->filefd = open(s->file, oopt, 0664)) != -1))
     {
       output_time("Script started on %c\n", s->filefd);
       if (!s->quiet)
-        dprintf(STDERR_FILENO, "Script started, file is %s\n", s->file);
+        dprintf(STDIN_FILENO, "Script started, file is %s\n", s->file);
       return (0);
     }
   perror("open_files");
@@ -60,7 +60,7 @@ int	close_files(t_script *s)
 {
   if (!s->quiet)
     {
-      dprintf(STDERR_FILENO, "Script done, file is %s\n", s->file);
+      dprintf(STDIN_FILENO, "Script done, file is %s\n", s->file);
       output_time("Script finished on %c\n", s->filefd);
     }
   if (s->timing && s->timingfd != STDERR_FILENO)

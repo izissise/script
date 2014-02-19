@@ -60,4 +60,4 @@ int	close_files(t_script *s);
 void	exec_command(char *shell, char *cmd);
 int	io_handling(t_script *s, pid_t shellpid);
 
-#endif // INCLUDE_H_INCLUDED
+#endif /* !INCLUDE_H_ */
