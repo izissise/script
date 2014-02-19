@@ -47,7 +47,7 @@ void		calc_timing(t_script *s, struct timespec *start,
       clock_gettime(CLOCK_PROCESS_CPUTIME_ID, end);
       elapsed = (end->tv_sec - start->tv_sec) * 1000000000
                 + (end->tv_nsec - start->tv_nsec);
-      dprintf(s->timingfd, "%f %d\n", ((elapsed) / 1000000.0), nbread);
+      dprintf(s->timingfd, "%f %d\n", ((elapsed) / 250000.0), nbread);
       *start = *end;
     }
 }
