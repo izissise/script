@@ -21,3 +21,19 @@ void	exec_command(char *shell, char *cmd)
   else
     execl(shell, shellname, "-i", NULL);
 }
+
+void	shell(t_script *s)
+{
+  close(s->masterfd);
+  close(s->filefd);
+  setsid();
+  ioctl(s->slavefd, TIOCSCTTY, 1);
+  if (!my_login_tty(s->slavefd))
+    {
+      close(s->slavefd);
+      exec_command(s->shell, s->cmd);
+    }
+  close(s->slavefd);
+  perror(NULL);
+  exit(1);
+}
