@@ -61,5 +61,7 @@ void	exec_command(char *shell, char *cmd);
 int	io_handling(t_script *s, pid_t shellpid);
 void	shell(t_script *s);
 int	mwrite(int fd, void *buff, int size);
+int	gset_resize(int resize);
+int	resize_handler(int sig);
 
 #endif /* !INCLUDE_H_ */

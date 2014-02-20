@@ -22,16 +22,16 @@ int	retransmit(int in, int out1, int out2, int flush)
     {
       write_ret = mwrite(out1, buff, read_ret);
       if (out2 != -1)
-        write_ret = mwrite(out2, buff, read_ret);
+        write_ret |= mwrite(out2, buff, read_ret);
       if (flush)
         fsync(out1);
       if (flush && out2 != -1)
         fsync(out2);
       return (read_ret);
     }
-  else if (read_ret == -1 || write_ret == -1)
+  else if (write_ret == -1)
     {
-      perror("Read/Write");
+      perror("Write");
       return (-1);
     }
   return (0);
@@ -59,6 +59,12 @@ int	redirect(t_script *s, fd_set *sfd,
   int	nbread;
 
   nbread = 0;
+  /* if (isatty(0) && gset_resize(-1))
+     {
+       ioctl(STDIN_FILENO, TIOCGWINSZ, &win);
+       ioctl(s->slavefd, TIOCSWINSZ, &win);
+       gset_resize(0);
+     }*/
   if (FD_ISSET(0, sfd))
     nbread = retransmit(0, s->masterfd, -1, s->flush);
   else if (FD_ISSET(s->masterfd, sfd))
@@ -74,6 +80,7 @@ void	empty_buffer(t_script *s,
 {
   int	nbread;
 
+  close(s->slavefd);
   while ((nbread = retransmit(s->masterfd, s->filefd, 1, s->flush)) > 0)
     calc_timing(s, start, end, nbread);
 }
@@ -105,3 +112,4 @@ int			io_handling(t_script *s, pid_t shellpid)
     }
   return (1);
 }
+

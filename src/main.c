@@ -17,7 +17,6 @@ int	my_forkpty(t_script *s, struct termios *t)
   shellpid = fork();
   if (shellpid > 0)
     {
-      close(s->slavefd);
       if (open_files(s))
         return (1);
       init_term(t, 0);
@@ -46,7 +45,7 @@ int			main(int ac, char *av[], char *env[])
     return (1);
   script.masterfd = master_fd;
   script.slavefd = slave_fd;
-  if ((tcgetattr(slave_fd, &t) == -1) || my_forkpty(&script, &t))
+  if ((tcgetattr(0, &t) == -1) || my_forkpty(&script, &t))
     return (1);
   tcsetattr(0, TCSAFLUSH, &t);
   close(master_fd);

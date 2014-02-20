@@ -10,6 +10,21 @@
 
 #include "include.h"
 
+int	gset_resize(int resize)
+{
+  static int	vresize = 0;
+
+  if (resize != -1)
+    vresize = resize;
+  return (vresize);
+}
+
+int	resize_handler(int sig)
+{
+  gset_resize(1);
+  return (0);
+}
+
 int			init_term(struct termios *cpy, int ttyout)
 {
   struct termios	t;
