@@ -62,6 +62,7 @@ int	io_handling(t_script *s, pid_t shellpid);
 void	shell(t_script *s);
 int	mwrite(int fd, void *buff, int size);
 int	gset_resize(int resize);
-int	resize_handler(int sig);
+void	resize_handler(int sig);
+int	resize_term(t_script *s);
 
 #endif /* !INCLUDE_H_ */

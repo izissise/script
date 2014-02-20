@@ -53,18 +53,12 @@ void		calc_timing(t_script *s, struct timespec *start,
     }
 }
 
-int	redirect(t_script *s, fd_set *sfd,
-             struct timespec *start, struct timespec *end)
+int			redirect(t_script *s, fd_set *sfd,
+                 struct timespec *start, struct timespec *end)
 {
-  int	nbread;
+  int			nbread;
 
   nbread = 0;
-  /* if (isatty(0) && gset_resize(-1))
-     {
-       ioctl(STDIN_FILENO, TIOCGWINSZ, &win);
-       ioctl(s->slavefd, TIOCSWINSZ, &win);
-       gset_resize(0);
-     }*/
   if (FD_ISSET(0, sfd))
     nbread = retransmit(0, s->masterfd, -1, s->flush);
   else if (FD_ISSET(s->masterfd, sfd))
@@ -80,6 +74,7 @@ void	empty_buffer(t_script *s,
 {
   int	nbread;
 
+  fsync(s->slavefd);
   close(s->slavefd);
   while ((nbread = retransmit(s->masterfd, s->filefd, 1, s->flush)) > 0)
     calc_timing(s, start, end, nbread);
@@ -97,7 +92,8 @@ int			io_handling(t_script *s, pid_t shellpid)
       FD_ZERO(&selectfd);
       FD_SET(0, &selectfd);
       FD_SET(s->masterfd, &selectfd);
-      if (select(s->masterfd + 1, &selectfd, NULL, NULL, NULL) == -1)
+      if (select(s->masterfd + 1, &selectfd, NULL, NULL, NULL) == -1
+          && errno != EINTR)
         {
           perror("Select");
           break;
@@ -107,7 +103,9 @@ int			io_handling(t_script *s, pid_t shellpid)
           empty_buffer(s, &start, &end);
           return (0);
         }
-      if (redirect(s, &selectfd, &start, &end) == -1)
+      if (isatty(0) && gset_resize(-1))
+        resize_term(s);
+      else if (redirect(s, &selectfd, &start, &end) == -1)
         break;
     }
   return (1);

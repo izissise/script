@@ -19,9 +19,20 @@ int	gset_resize(int resize)
   return (vresize);
 }
 
-int	resize_handler(int sig)
+void	resize_handler(int sig)
 {
+  (void)sig;
   gset_resize(1);
+}
+
+int			resize_term(t_script *s)
+{
+  struct winsize	win;
+
+  if (ioctl(STDIN_FILENO, TIOCGWINSZ, &win) == -1
+      || ioctl(s->slavefd, TIOCSWINSZ, &win) == -1)
+    return (1);
+  gset_resize(0);
   return (0);
 }
 
