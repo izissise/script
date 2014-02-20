@@ -5,7 +5,7 @@
 ** Login   <moriss_h@epitech.net>
 **
 ** Started on  Mon Oct  8 09:34:29 2012 hugues morisset
-** Last update Mon Oct  8 16:20:21 2012 hugues morisset
+** Last update Thu Feb 20 17:04:30 2014 Hugues
 */
 
 #include "include.h"
@@ -54,7 +54,7 @@ void		calc_timing(t_script *s, struct timespec *start,
 }
 
 int			redirect(t_script *s, fd_set *sfd,
-                 struct timespec *start, struct timespec *end)
+				 struct timespec *start, struct timespec *end)
 {
   int			nbread;
 
@@ -69,8 +69,8 @@ int			redirect(t_script *s, fd_set *sfd,
   return ((nbread == -1) ? 1 : 0);
 }
 
-void	empty_buffer(t_script *s,
-                   struct timespec *start, struct timespec *end)
+int	empty_buffer(t_script *s,
+		     struct timespec *start, struct timespec *end)
 {
   int	nbread;
 
@@ -78,6 +78,7 @@ void	empty_buffer(t_script *s,
   close(s->slavefd);
   while ((nbread = retransmit(s->masterfd, s->filefd, 1, s->flush)) > 0)
     calc_timing(s, start, end, nbread);
+  return (0);
 }
 
 int			io_handling(t_script *s, pid_t shellpid)
@@ -96,18 +97,14 @@ int			io_handling(t_script *s, pid_t shellpid)
           && errno != EINTR)
         {
           perror("Select");
-          break;
+          return (1);
         }
       if (waitpid(shellpid, &(s->retvalue), WNOHANG) > 0)
-        {
-          empty_buffer(s, &start, &end);
-          return (0);
-        }
+        return (empty_buffer(s, &start, &end));
       if (isatty(0) && gset_resize(-1))
         resize_term(s);
       else if (redirect(s, &selectfd, &start, &end) == -1)
-        break;
+        return (1);
     }
-  return (1);
+  return (0);
 }
-

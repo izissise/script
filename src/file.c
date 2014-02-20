@@ -10,10 +10,10 @@
 
 #include "include.h"
 
-void	output_time(char *format, int fd)
+void		output_time(char *format, int fd)
 {
   time_t	ctime;
-  char	timebuff[4096];
+  char		timebuff[4096];
 
   ctime = time(NULL);
   strftime(timebuff, sizeof(timebuff), format, localtime(&ctime));

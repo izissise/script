@@ -10,7 +10,7 @@
 
 #include "include.h"
 
-int	gset_resize(int resize)
+int		gset_resize(int resize)
 {
   static int	vresize = 0;
 

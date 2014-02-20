@@ -63,11 +63,11 @@ int		help()
   return (1);
 }
 
-int			parse_opt(int ac, char **av, char **envp, t_script *script)
+int		parse_opt(int ac, char **av, char **envp, t_script *script)
 {
   struct option	options[10];
-  int			c;
-  int			option_index;
+  int		c;
+  int		option_index;
 
   init_opt(envp, script, options);
   c = 0;

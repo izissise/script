@@ -41,8 +41,7 @@ void	shell(t_script *s)
   close(s->masterfd);
   close(s->filefd);
   setsid();
-  ioctl(s->slavefd, TIOCSCTTY, 1);
-  if (!my_login_tty(s->slavefd))
+  if ((ioctl(s->slavefd, TIOCSCTTY, 1) != -1) && !my_login_tty(s->slavefd))
     {
       close(s->slavefd);
       exec_command(s->shell, s->cmd);
