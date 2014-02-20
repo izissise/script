@@ -19,6 +19,7 @@ int	my_forkpty(t_script *s, struct termios *t)
     {
       if (isatty(0))
         resize_term(s);
+      signal(SIGWINCH, &resize_handler);
       if (open_files(s))
         return (1);
       init_term(t, 0);
@@ -47,7 +48,6 @@ int			main(int ac, char *av[], char *env[])
     return (1);
   script.masterfd = master_fd;
   script.slavefd = slave_fd;
-  signal(SIGWINCH, &resize_handler);
   if ((tcgetattr(0, &t) == -1) || my_forkpty(&script, &t))
     return (1);
   tcsetattr(0, TCSAFLUSH, &t);
