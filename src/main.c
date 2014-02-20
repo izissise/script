@@ -17,7 +17,8 @@ int	my_forkpty(t_script *s, struct termios *t)
   shellpid = fork();
   if (shellpid > 0)
     {
-      resize_term(s);
+      if (isatty(0))
+        resize_term(s);
       if (open_files(s))
         return (1);
       init_term(t, 0);

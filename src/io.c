@@ -54,7 +54,7 @@ void		calc_timing(t_script *s, struct timespec *start,
 }
 
 int			redirect(t_script *s, fd_set *sfd,
-				 struct timespec *start, struct timespec *end)
+                 struct timespec *start, struct timespec *end)
 {
   int			nbread;
 
@@ -70,7 +70,7 @@ int			redirect(t_script *s, fd_set *sfd,
 }
 
 int	empty_buffer(t_script *s,
-		     struct timespec *start, struct timespec *end)
+                 struct timespec *start, struct timespec *end)
 {
   int	nbread;
 

@@ -16,7 +16,7 @@ int	mwrite(int fd, void *buff, int size)
 
   while ((len = write(fd, buff, size)) != size)
     {
-      if (len == -1)
+      if ((len == -1) && (errno != EINTR))
         return (-1);
       buff = &(((char*)buff)[len]);
       size -= len;
