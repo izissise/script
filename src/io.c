@@ -20,9 +20,9 @@ int	retransmit(int in, int out1, int out2, int flush)
   write_ret = 0;
   if (read_ret > 0)
     {
-      write_ret = write(out1, buff, read_ret);
+      write_ret = mwrite(out1, buff, read_ret);
       if (out2 != -1)
-        write_ret = write(out2, buff, read_ret);
+        write_ret = mwrite(out2, buff, read_ret);
       if (flush)
         fsync(out1);
       if (flush && out2 != -1)
@@ -31,8 +31,8 @@ int	retransmit(int in, int out1, int out2, int flush)
     }
   else if (read_ret == -1 || write_ret == -1)
     {
-      perror(NULL);
-      return (1);
+      perror("Read/Write");
+      return (-1);
     }
   return (0);
 }
@@ -68,13 +68,21 @@ int	redirect(t_script *s, fd_set *sfd,
   return ((nbread == -1) ? 1 : 0);
 }
 
+void	empty_buffer(t_script *s,
+                   struct timespec *start, struct timespec *end)
+{
+  int	nbread;
+
+  while ((nbread = retransmit(s->masterfd, s->filefd, 1, s->flush)) > 0)
+    calc_timing(s, start, end, nbread);
+}
+
 int			io_handling(t_script *s, pid_t shellpid)
 {
   fd_set		selectfd;
   struct timespec	start;
   struct timespec	end;
 
-  close(s->slavefd);
   while (1)
     {
       clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &start);
@@ -82,16 +90,17 @@ int			io_handling(t_script *s, pid_t shellpid)
       FD_SET(0, &selectfd);
       FD_SET(s->masterfd, &selectfd);
       if (select(s->masterfd + 1, &selectfd, NULL, NULL, NULL) == -1)
-        break;
+        {
+          perror("Select");
+          break;
+        }
       if (waitpid(shellpid, &(s->retvalue), WNOHANG) > 0)
         {
-          calc_timing(s, &start, &end,
-                      retransmit(s->masterfd, s->filefd, 1, s->flush));
+          empty_buffer(s, &start, &end);
           return (0);
         }
       if (redirect(s, &selectfd, &start, &end) == -1)
         break;
     }
-  perror(NULL);
   return (1);
 }

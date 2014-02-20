@@ -10,6 +10,20 @@
 
 #include "include.h"
 
+int	mwrite(int fd, void *buff, int size)
+{
+  int	len;
+
+  while ((len = write(fd, buff, size)) != size)
+    {
+      if (len == -1)
+        return (-1);
+      buff = &(((char*)buff)[len]);
+      size -= len;
+    }
+  return (0);
+}
+
 void	exec_command(char *shell, char *cmd)
 {
   char	*shellname;
@@ -34,6 +48,6 @@ void	shell(t_script *s)
       exec_command(s->shell, s->cmd);
     }
   close(s->slavefd);
-  perror(NULL);
+  perror("Exec");
   exit(1);
 }

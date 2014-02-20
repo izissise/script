@@ -17,6 +17,7 @@ int	my_forkpty(t_script *s, struct termios *t)
   shellpid = fork();
   if (shellpid > 0)
     {
+      close(s->slavefd);
       if (open_files(s))
         return (1);
       init_term(t, 0);
@@ -28,7 +29,7 @@ int	my_forkpty(t_script *s, struct termios *t)
     shell(s);
   else
     {
-      perror(NULL);
+      perror("Fork");
       return (1);
     }
   return (0);

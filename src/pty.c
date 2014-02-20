@@ -57,7 +57,7 @@ int	my_openpty(int *amaster, int *aslave)
       return (0);
     }
   free(slave_name);
-  perror(NULL);
+  perror("OpenPTY");
   close(*amaster);
   close(*aslave);
   return (1);
@@ -68,6 +68,6 @@ int	my_login_tty(int slave)
   if ((dup2(slave, STDIN_FILENO) != -1) && (dup2(slave, STDOUT_FILENO) != -1)
       && (dup2(slave, STDERR_FILENO) != -1))
     return (0);
-  perror(NULL);
+  perror("dup2");
   return (1);
 }

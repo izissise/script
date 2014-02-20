@@ -52,7 +52,7 @@ int	open_files(t_script *s)
         dprintf(STDIN_FILENO, "Script started, file is %s\n", s->file);
       return (0);
     }
-  perror("open_files");
+  perror("Open files");
   return (1);
 }
 
@@ -67,7 +67,7 @@ int	close_files(t_script *s)
     close(s->timingfd);
   if (close(s->filefd) == -1)
     {
-      perror("close_files");
+      perror("Close files");
       return (1);
     }
   return (0);
