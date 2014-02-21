@@ -42,7 +42,7 @@ void	init_opt(char **envp, t_script *script, struct option *opt)
 int		help()
 {
   dprintf(STDERR_FILENO, "Usage:\n");
-  dprintf(STDERR_FILENO, " script [options] [file]\n");
+  dprintf(STDERR_FILENO, " my_script [options] [file]\n");
   dprintf(STDERR_FILENO, "Options:\n");
   dprintf(STDERR_FILENO, " -a, --append            append the output\n");
   dprintf(STDERR_FILENO, " -c, --command <command> run command rather than int"
@@ -81,7 +81,7 @@ int		parse_opt(int ac, char **av, char **envp, t_script *script)
       script->quiet |= (c == 'q');
       if (!(script->timing) && (script->timing |= (c == 't')))
         script->timingout = optarg;
-      if (c == 'v' || c == 'h')
+      if (c == 'v' || c == 'h' || c == '?')
         return (help());
       if (c == 'c')
         script->cmd = optarg;

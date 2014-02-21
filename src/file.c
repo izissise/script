@@ -49,7 +49,7 @@ int	open_files(t_script *s)
     {
       output_time("Script started on %c\n", s->filefd);
       if (!s->quiet)
-        dprintf(STDIN_FILENO, "Script started, file is %s\n", s->file);
+        dprintf(STDOUT_FILENO, "Script started, file is %s\n", s->file);
       return (0);
     }
   perror("Open files");
@@ -60,7 +60,7 @@ int	close_files(t_script *s)
 {
   if (!s->quiet)
     {
-      dprintf(STDIN_FILENO, "Script done, file is %s\n", s->file);
+      dprintf(STDOUT_FILENO, "Script done, file is %s\n", s->file);
       output_time("Script finished on %c\n", s->filefd);
     }
   if (s->timing && s->timingfd != STDERR_FILENO)
