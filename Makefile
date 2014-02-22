@@ -26,7 +26,7 @@ NAME		=	my_script
 OBJDIR		=	obj/
 SRCDIR		=	src/
 
-CFLAGS		+=	-g -Wall -Wextra
+CFLAGS		+=	-Wall -Wextra
 
 LDFLAGS		+=
 
