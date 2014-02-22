@@ -5,7 +5,7 @@
 ## Login   <moriss_h@epitech.net>
 ##
 ## Started on  Sun Jun  9 03:35:24 2013 Hugues
-## Last update Mon Feb  3 17:37:39 2014 jonathan.collinet
+## Last update Sat Feb 22 19:04:48 2014 Hugues
 ##
 
 SRC		=	main.c \
@@ -28,7 +28,7 @@ SRCDIR		=	src/
 
 CFLAGS		+=	-Wall -Wextra
 
-LDFLAGS		+=
+LDFLAGS		+=	-lrt
 
 OBJ		=	$(patsubst %.c,${OBJDIR}%.o, $(SRC))
 
